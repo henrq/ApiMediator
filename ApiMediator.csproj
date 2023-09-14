@@ -8,8 +8,6 @@
     <Folder Include="Controllers\" />
     <Folder Include="Domain\Customer\Handler\" />
     <Folder Include="EventsHandlers\" />
-    <Folder Include="Infra\" />
-    <Folder Include="Notifications\" />
   </ItemGroup>
 
   <ItemGroup>
