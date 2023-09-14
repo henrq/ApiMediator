@@ -1,3 +1,4 @@
+using ApiMediator.Infra;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,10 +7,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+
 
 namespace ApiMediator
 {
@@ -26,8 +30,21 @@ namespace ApiMediator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddMvc();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             services.AddSingleton<ICustomerRepository, CustomerRepository>();
-            services.AddMediatR(typeof(Startup));
+            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Mediator Pattern com MediatR ",
+                    Description = "by Henrique de Faria",
+                    
+                });
+            });
+
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -36,8 +53,6 @@ namespace ApiMediator
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseMvc();
 
             app.UseHttpsRedirection();
 
@@ -49,6 +64,13 @@ namespace ApiMediator
             {
                 endpoints.MapControllers();
             });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Showing API V1");
+            });
+
+            // app.UseMvc();
         }
     }
 }
